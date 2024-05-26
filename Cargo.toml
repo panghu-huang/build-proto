@@ -1,18 +1,24 @@
 [package]
-name = "build-proto"
+name = "proto"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+authors = ["wokeyifrontend@gmail.com"]
+homepage = "https://github.com/panghu-huang/proto"
+repository = "https://github.com/panghu-huang/proto"
+description = "`proto` allows you to define Protocol Buffers using Rust code to reuse Rust's type system and ecosystem."
+keywords = ["protobuf", "proto", "rpc", "tonic"]
 
 [lib]
 proc-macro = true
 
 [dependencies]
-tonic = "0.11.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
 proc-macro2 = "1.0.84"
 quote = "1.0.36"
 syn = "2.0.66"
 
-[build-dependencies]
+[dev-dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tonic = "0.11.0"
 tonic-build = "0.11.0"

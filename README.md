@@ -1,7 +1,14 @@
+# proto
+
+`proto` allows you to define Protocol Buffers using Rust code to reuse Rust's type system and ecosystem.
+
+## Example
+
+```rust
 use proto::proto;
 
-#[test]
-fn basic() {
+fn main() {
+  // Define a Protocol Buffers service
   let service = proto! {
     package example;
     codec crate::common::JsonCodec;
@@ -12,6 +19,7 @@ fn basic() {
   };
 
   tonic_build::manual::Builder::new()
-    .out_dir("./tests/pb")
+    .out_dir("./pb")
     .compile(&[service]);
 }
+```
