@@ -1,4 +1,5 @@
-use crate::{keyword, service::Service};
+use crate::{case::RenameRule, keyword, service::Service};
+use proc_macro::TokenStream;
 use syn::{
   parse::{Parse, ParseStream},
   Ident, Result, Token, Type,
@@ -62,20 +63,45 @@ impl Parse for Proto {
 }
 
 impl Proto {
-  pub fn codegen(&self) -> proc_macro2::TokenStream {
+  pub fn codegen(&self) -> TokenStream {
     let rpcs = self.service.rpcs.iter().map(|rpc| {
-      let name = &rpc.name;
+      let name = RenameRule::SnakeCase.apply_to_variant(&rpc.name.to_string());
+      let name = Ident::new(&name, rpc.name.span());
+
+      let route_name = RenameRule::PascalCase.apply_to_field(&rpc.name.to_string());
+      let route_name = Ident::new(&route_name, rpc.name.span());
+
       let request = &rpc.request;
       let response = &rpc.response;
       let codec_path = &self.codec_path;
+      let request_streaming = rpc.request_streaming;
+      let response_streaming = rpc.response_streaming;
+
+      let client_streaming = if request_streaming {
+        quote::quote! {
+          .client_streaming()
+        }
+      } else {
+        quote::quote! {}
+      };
+
+      let server_streaming = if response_streaming {
+        quote::quote! {
+          .server_streaming()
+        }
+      } else {
+        quote::quote! {}
+      };
 
       quote::quote! {
         tonic_build::manual::Method::builder()
           .name(stringify!(#name))
-          .route_name(stringify!(#name))
+          .route_name(stringify!(#route_name))
           .input_type(stringify!(#request))
           .output_type(stringify!(#response))
           .codec_path(stringify!(#codec_path))
+          #client_streaming
+          #server_streaming
           .build()
       }
     });
@@ -92,6 +118,7 @@ impl Proto {
         .build()
       }
     }
+    .into()
   }
 }
 

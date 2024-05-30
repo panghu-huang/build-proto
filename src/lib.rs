@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+pub(crate) mod case;
 pub(crate) mod rpc;
 pub(crate) mod service;
 

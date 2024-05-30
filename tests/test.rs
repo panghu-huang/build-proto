@@ -2,7 +2,7 @@ use proto::proto;
 
 #[test]
 fn basic() {
-  let service = proto! {
+  let greeter_service = proto! {
     package example;
     codec crate::common::JsonCodec;
 
@@ -11,7 +11,16 @@ fn basic() {
     }
   };
 
+  let helloworld_service = proto! {
+    package example;
+    codec crate::common::JsonCodec;
+
+    service HelloWorld {
+      rpc hello_world (crate::HelloRequest) returns (stream crate::HelloResponse) {}
+    }
+  };
+
   tonic_build::manual::Builder::new()
     .out_dir("./tests/pb")
-    .compile(&[service]);
+    .compile(&[greeter_service, helloworld_service]);
 }
